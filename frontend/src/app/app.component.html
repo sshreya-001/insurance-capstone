@@ -1,0 +1,43 @@
+<div class="app-container">
+  <!-- Navigation Bar -->
+  <nav class="navbar" *ngIf="showNavigation && currentUser">
+    <div class="nav-content">
+      <div class="nav-brand">
+        <h2>Insurance Portal</h2>
+      </div>
+      
+      <div class="nav-links">
+        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        <a routerLink="/policies" routerLinkActive="active">Policies</a>
+        
+        <!-- Customer specific links -->
+        <ng-container *ngIf="currentUser.role === 'customer'">
+          <a routerLink="/claims" routerLinkActive="active">My Claims</a>
+          <a routerLink="/payments" routerLinkActive="active">Payments</a>
+        </ng-container>
+        
+        <!-- Agent specific links -->
+        <ng-container *ngIf="currentUser.role === 'agent'">
+          <a routerLink="/claims" routerLinkActive="active">Review Claims</a>
+        </ng-container>
+        
+        <!-- Admin specific links -->
+        <ng-container *ngIf="currentUser.role === 'admin'">
+          <a routerLink="/admin" routerLinkActive="active">Admin Panel</a>
+          <a routerLink="/claims" routerLinkActive="active">All Claims</a>
+        </ng-container>
+      </div>
+      
+      <div class="nav-user">
+        <span class="user-name">{{ currentUser.name }}</span>
+        <span class="user-role" [class]="currentUser.role">{{ currentUser.role | titlecase }}</span>
+        <button class="btn-logout" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content" [class.with-nav]="showNavigation && currentUser">
+    <router-outlet></router-outlet>
+  </main>
+</div>
