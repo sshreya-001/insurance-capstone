@@ -1,0 +1,44 @@
+<section class="min-h-[100dvh] grid place-items-center p-6">
+  <div class="w-full max-w-xl bg-white/80 backdrop-blur border border-plum-900/10 rounded-2xl shadow-luxury p-8">
+    <div class="mb-6">
+      <h1 class="text-2xl font-semibold tracking-tight text-plum-900">Create your account</h1>
+      <p class="text-sm text-mauve-700 mt-1">Join us to manage your policies with ease</p>
+    </div>
+
+    <form class="grid gap-4 md:grid-cols-2" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="flex flex-col gap-2 md:col-span-1">
+        <label class="text-sm text-mauve-700" for="name">Name</label>
+        <input id="name" class="px-3 py-2.5 border border-plum-900/15 rounded-lg bg-white text-plum-900 outline-none focus:ring-4 focus:ring-peach-400/25 focus:border-peach-400" type="text" formControlName="name" />
+        <span class="text-xs text-mauve-700/90" *ngIf="form.controls.name.touched && form.controls.name.invalid">Name is required</span>
+      </div>
+      <div class="flex flex-col gap-2 md:col-span-1">
+        <label class="text-sm text-mauve-700" for="email">Email</label>
+        <input id="email" class="px-3 py-2.5 border border-plum-900/15 rounded-lg bg-white text-plum-900 outline-none focus:ring-4 focus:ring-peach-400/25 focus:border-peach-400" type="email" formControlName="email" />
+        <span class="text-xs text-mauve-700/90" *ngIf="form.controls.email.touched && form.controls.email.invalid">Valid email is required</span>
+      </div>
+      <div class="flex flex-col gap-2 md:col-span-1">
+        <label class="text-sm text-mauve-700" for="password">Password</label>
+        <input id="password" class="px-3 py-2.5 border border-plum-900/15 rounded-lg bg-white text-plum-900 outline-none focus:ring-4 focus:ring-peach-400/25 focus:border-peach-400" type="password" formControlName="password" />
+        <span class="text-xs text-mauve-700/90" *ngIf="form.controls.password.touched && form.controls.password.invalid">Password is required</span>
+      </div>
+      <div class="flex flex-col gap-2 md:col-span-1">
+        <label class="text-sm text-mauve-700" for="role">Role</label>
+        <select id="role" class="px-3 py-2.5 border border-plum-900/15 rounded-lg bg-white text-plum-900 outline-none focus:ring-4 focus:ring-peach-400/25 focus:border-peach-400" formControlName="role">
+          <option value="customer">Customer</option>
+          <option value="agent">Agent</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <button class="md:col-span-2 w-full inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-peach-400 to-mauve-700 text-white px-4 py-3 shadow-md hover:brightness-105 active:translate-y-px transition" type="submit" [disabled]="form.invalid || loading">{{ loading ? 'Creating...' : 'Create account' }}</button>
+    </form>
+
+    <div class="flex items-center justify-between mt-4">
+      <a class="inline-flex items-center justify-center rounded-xl border border-plum-900/15 text-plum-900 px-4 py-2.5 bg-white/70 hover:bg-white transition" routerLink="/">Back to Home</a>
+      <a class="text-mauve-700 hover:underline" routerLink="/login">Already have an account? Login</a>
+    </div>
+
+    <p *ngIf="error" class="text-sm text-red-600 mt-3">{{ error }}</p>
+  </div>
+</section>
+
+

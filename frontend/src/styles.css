@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global luxury gradient background */
+@layer base {
+  html, body { height: 100%; }
+  body {
+    @apply m-0 text-plum-900 font-sans antialiased;
+    background:
+      linear-gradient(180deg, rgba(243,216,210,.65), rgba(205,180,200,.55)),
+      radial-gradient(1200px 600px at 10% -10%, rgba(216,148,135,.35), transparent 60%),
+      radial-gradient(800px 400px at 110% 0%, rgba(43,36,49,.45), transparent 50%),
+      #fff;
+    background-attachment: fixed;
+  }
+}
+
+/* Reusable luxury card */
+@layer components {
+  .lux-container { @apply min-h-[100dvh] grid place-items-center p-6; }
+  .lux-card { @apply w-[min(720px,92vw)] bg-white/70 backdrop-blur border border-plum-900/10 rounded-xl shadow-luxury p-8; }
+  .lux-title { @apply text-3xl font-bold tracking-tight text-plum-900 mb-6; }
+  .lux-muted { @apply text-mauve-700; }
+
+  .lux-form { @apply grid gap-4 md:grid-cols-2; }
+  .lux-label { @apply flex flex-col gap-2 text-[0.95rem] text-mauve-700; }
+  .lux-input { @apply px-3 py-2.5 border border-plum-900/15 rounded-lg bg-white text-plum-900 outline-none focus:ring-4 focus:ring-peach-400/25 focus:border-peach-400; }
+  .lux-select { @apply lux-input; }
+  .lux-button { @apply col-span-full mt-1 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-peach-400 to-mauve-700 text-white px-4 py-3 shadow-md hover:brightness-105 active:translate-y-px transition; }
+  .lux-link { @apply text-mauve-700 hover:underline; }
+
+  /* Variants */
+  .lux-button-outline { @apply inline-flex items-center justify-center rounded-xl border border-plum-900/15 text-plum-900 px-4 py-3 bg-white/70 hover:bg-white transition; }
+  .lux-hint { @apply text-xs text-mauve-700/90; }
+  .lux-error { @apply text-sm text-red-600; }
+}
+
+/* You can add global styles to this file, and also import other style files */
