@@ -14,12 +14,9 @@ export const authGuard: CanActivateFn = (route) => {
 
   const requiredRole = route.data?.['role'] as 'customer' | 'agent' | 'admin' | undefined;
   if (requiredRole && user.role !== requiredRole) {
-    // Redirect to their own dashboard if role mismatch
     router.navigateByUrl(`/${user.role}`);
     return false;
   }
 
   return true;
 };
-
-

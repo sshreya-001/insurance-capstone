@@ -11,6 +11,8 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
+})
+export class LoginComponent {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
@@ -44,5 +46,3 @@ export class LoginComponent {
     });
   }
 }
-
-

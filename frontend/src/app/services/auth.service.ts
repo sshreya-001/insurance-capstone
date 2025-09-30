@@ -23,11 +23,19 @@ export interface RegisterResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
-  // Consider moving to environment file or dev proxy
   private readonly baseUrl = 'http://localhost:5000/api/v1/auth';
 
   private userSubject = new BehaviorSubject<AuthUser | null>(null);
   readonly user$ = this.userSubject.asObservable();
+
+  constructor() {
+    this.userSubject.next(this.currentUser);
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'auth_user' || e.key === 'auth_token') {
+        this.userSubject.next(this.currentUser);
+      }
+    });
+  }
 
   login(email: string, password: string): Observable<LoginResponse> {
     return this.http
@@ -66,17 +74,4 @@ export class AuthService {
     const raw = localStorage.getItem('auth_user');
     return raw ? (JSON.parse(raw) as AuthUser) : null;
   }
-
-  constructor() {
-    // Initialize subject from storage on app start
-    this.userSubject.next(this.currentUser);
-    // Listen to other tabs
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'auth_user' || e.key === 'auth_token') {
-        this.userSubject.next(this.currentUser);
-      }
-    });
-  }
 }
-
-

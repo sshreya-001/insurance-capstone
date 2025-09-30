@@ -1,0 +1,136 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>Insurance Portal Dashboard</h1>
+      <div class="user-info">
+        <span class="user-name">{{ currentUser?.name }}</span>
+        <span class="user-role" [class]="currentUser?.role">{{ currentUser?.role | titlecase }}</span>
+        <button class="btn-logout" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-content" *ngIf="!loading">
+    <!-- Admin Dashboard -->
+    <div *ngIf="currentUser?.role === 'admin'" class="admin-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <h3>{{ adminSummary?.users || 0 }}</h3>
+            <p>Total Users</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-info">
+            <h3>{{ adminSummary?.policiesSold || 0 }}</h3>
+            <p>Policies Sold</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-info">
+            <h3>{{ adminSummary?.claimsPending || 0 }}</h3>
+            <p>Pending Claims</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <h3>${{ adminSummary?.totalPayments || 0 | number:'1.2-2' }}</h3>
+            <p>Total Payments</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-actions">
+        <button class="btn-primary" routerLink="/policies">Manage Policies</button>
+        <button class="btn-secondary" routerLink="/claims">Review Claims</button>
+        <button class="btn-secondary" routerLink="/admin/audit">Audit Logs</button>
+      </div>
+    </div>
+
+    <!-- Customer Dashboard -->
+    <div *ngIf="currentUser?.role === 'customer'" class="customer-dashboard">
+      <div class="dashboard-section">
+        <h2>My Policies</h2>
+        <div class="policies-grid" *ngIf="userPolicies.length > 0; else noPolicies">
+          <div class="policy-card" *ngFor="let policy of userPolicies">
+            <div class="policy-header">
+              <h3>{{ policy.policyProductId.title }}</h3>
+              <span class="policy-status" [class]="policy.status.toLowerCase()">
+                {{ policy.status }}
+              </span>
+            </div>
+            <div class="policy-details">
+              <p><strong>Premium:</strong> ${{ policy.premiumPaid | number:'1.2-2' }}</p>
+              <p><strong>Start Date:</strong> {{ policy.startDate | date:'mediumDate' }}</p>
+              <p><strong>End Date:</strong> {{ policy.endDate | date:'mediumDate' }}</p>
+            </div>
+          </div>
+        </div>
+        <ng-template #noPolicies>
+          <p class="no-data">No policies found. <a routerLink="/policies">Browse available policies</a></p>
+        </ng-template>
+      </div>
+
+      <div class="dashboard-section">
+        <h2>My Claims</h2>
+        <div class="claims-list" *ngIf="userClaims.length > 0; else noClaims">
+          <div class="claim-item" *ngFor="let claim of userClaims">
+            <div class="claim-info">
+              <h4>Claim #{{ claim._id.slice(-6) }}</h4>
+              <p>{{ claim.description }}</p>
+              <p><strong>Amount:</strong> ${{ claim.amountClaimed | number:'1.2-2' }}</p>
+            </div>
+            <span class="claim-status" [class]="claim.status.toLowerCase()">
+              {{ claim.status }}
+            </span>
+          </div>
+        </div>
+        <ng-template #noClaims>
+          <p class="no-data">No claims submitted yet.</p>
+        </ng-template>
+      </div>
+
+      <div class="customer-actions">
+        <button class="btn-primary" routerLink="/policies">Browse Policies</button>
+        <button class="btn-secondary" routerLink="/claims/submit">Submit Claim</button>
+        <button class="btn-secondary" routerLink="/payments">Payment History</button>
+      </div>
+    </div>
+
+    <!-- Agent Dashboard -->
+    <div *ngIf="currentUser?.role === 'agent'" class="agent-dashboard">
+      <div class="dashboard-section">
+        <h2>Claims to Review</h2>
+        <div class="claims-list" *ngIf="userClaims.length > 0; else noClaims">
+          <div class="claim-item" *ngFor="let claim of userClaims">
+            <div class="claim-info">
+              <h4>Claim #{{ claim._id.slice(-6) }}</h4>
+              <p><strong>Customer:</strong> {{ claim.userId.name }}</p>
+              <p>{{ claim.description }}</p>
+              <p><strong>Amount:</strong> ${{ claim.amountClaimed | number:'1.2-2' }}</p>
+            </div>
+            <span class="claim-status" [class]="claim.status.toLowerCase()">
+              {{ claim.status }}
+            </span>
+          </div>
+        </div>
+        <ng-template #noClaims>
+          <p class="no-data">No claims to review.</p>
+        </ng-template>
+      </div>
+
+      <div class="agent-actions">
+        <button class="btn-primary" routerLink="/claims">Review Claims</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading dashboard...</p>
+  </div>
+</div>

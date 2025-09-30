@@ -1,0 +1,136 @@
+<div class="policies-container">
+  <div class="policies-header">
+    <h1>Insurance Policies</h1>
+    <p>Choose the perfect insurance plan for your needs</p>
+  </div>
+
+  <div class="policies-content" *ngIf="!loading">
+    <div class="policies-grid">
+      <div class="policy-card" *ngFor="let policy of policies">
+        <div class="policy-header">
+          <h3>{{ policy.title }}</h3>
+          <div class="policy-code">{{ policy.code }}</div>
+        </div>
+        
+        <div class="policy-body">
+          <p class="policy-description">{{ policy.description }}</p>
+          
+          <div class="policy-details">
+            <div class="detail-item">
+              <span class="label">Premium:</span>
+              <span class="value">${{ policy.premium | number:'1.2-2' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Term:</span>
+              <span class="value">{{ policy.termMonths }} months</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Min Coverage:</span>
+              <span class="value">${{ policy.minSumInsured | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="policy-footer">
+          <button 
+            class="btn-purchase" 
+            (click)="openPurchaseModal(policy)"
+            *ngIf="currentUser?.role === 'customer'"
+          >
+            Purchase Policy
+          </button>
+          <div class="policy-info" *ngIf="currentUser?.role !== 'customer'">
+            <span class="info-text">Customer login required to purchase</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading policies...</p>
+  </div>
+</div>
+
+<!-- Purchase Modal -->
+<div class="modal-overlay" *ngIf="showPurchaseModal" (click)="closePurchaseModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Purchase Policy</h2>
+      <button class="modal-close" (click)="closePurchaseModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body" *ngIf="selectedPolicy">
+      <div class="policy-summary">
+        <h3>{{ selectedPolicy.title }}</h3>
+        <p>{{ selectedPolicy.description }}</p>
+        <div class="summary-details">
+          <div class="summary-item">
+            <span>Premium:</span>
+            <span>${{ selectedPolicy.premium | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-item">
+            <span>Default Term:</span>
+            <span>{{ selectedPolicy.termMonths }} months</span>
+          </div>
+        </div>
+      </div>
+
+      <form [formGroup]="purchaseForm" (ngSubmit)="purchasePolicy()" class="purchase-form">
+        <div class="form-group">
+          <label for="termMonths">Term (months)</label>
+          <input
+            type="number"
+            id="termMonths"
+            formControlName="termMonths"
+            class="form-control"
+            [placeholder]="selectedPolicy.termMonths.toString()"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="nomineeName">Nominee Name *</label>
+          <input
+            type="text"
+            id="nomineeName"
+            formControlName="nomineeName"
+            class="form-control"
+            [class.error]="purchaseForm.get('nomineeName')?.invalid && purchaseForm.get('nomineeName')?.touched"
+          />
+          <div class="error-message" *ngIf="purchaseForm.get('nomineeName')?.invalid && purchaseForm.get('nomineeName')?.touched">
+            Nominee name is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="nomineeRelation">Nominee Relation *</label>
+          <select
+            id="nomineeRelation"
+            formControlName="nomineeRelation"
+            class="form-control"
+            [class.error]="purchaseForm.get('nomineeRelation')?.invalid && purchaseForm.get('nomineeRelation')?.touched"
+          >
+            <option value="">Select relation</option>
+            <option value="spouse">Spouse</option>
+            <option value="child">Child</option>
+            <option value="parent">Parent</option>
+            <option value="sibling">Sibling</option>
+            <option value="other">Other</option>
+          </select>
+          <div class="error-message" *ngIf="purchaseForm.get('nomineeRelation')?.invalid && purchaseForm.get('nomineeRelation')?.touched">
+            Nominee relation is required
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="closePurchaseModal()">Cancel</button>
+          <button type="submit" class="btn-confirm" [disabled]="purchaseForm.invalid || purchasing">
+            <span *ngIf="purchasing">Processing...</span>
+            <span *ngIf="!purchasing">Purchase Policy</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
