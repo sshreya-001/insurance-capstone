@@ -1,3 +1,6 @@
+import { User } from './user.model';
+import { UserPolicy } from './policy.model';
+
 export interface Claim {
   _id: string;
   userId: User;

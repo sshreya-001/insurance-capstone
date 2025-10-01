@@ -7,7 +7,7 @@ const userPolicySchema = new mongoose.Schema(
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     premiumPaid: { type: Number, required: true },
-    status: { type: String, enum: ["ACTIVE", "CANCELLED", "EXPIRED"], default: "ACTIVE" },
+    status: { type: String, enum: ["ACTIVE", "PENDING_AGENT", "CANCELLED", "EXPIRED"], default: "ACTIVE" },
     assignedAgentId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
     nominee: {
       name: { type: String },

@@ -1,0 +1,106 @@
+// Claims component specific styles
+.lux-container {
+  @apply min-h-screen bg-gray-50 py-8;
+}
+
+.lux-card {
+  @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+}
+
+.lux-title {
+  @apply text-2xl font-bold text-gray-800;
+}
+
+// Modal animations
+.modal-enter {
+  animation: modalEnter 0.2s ease-out;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Status badge animations
+.status-badge {
+  @apply transition-all duration-200;
+}
+
+.status-badge:hover {
+  @apply transform scale-105;
+}
+
+// Table row hover effects
+.claims-table tbody tr {
+  @apply transition-colors duration-150;
+}
+
+.claims-table tbody tr:hover {
+  @apply bg-gray-50;
+}
+
+// Form focus states
+.form-input:focus {
+  @apply ring-2 ring-blue-500 border-blue-500 outline-none;
+}
+
+// Loading spinner
+.loading-spinner {
+  @apply inline-block animate-spin rounded-full border-2 border-solid border-current border-r-transparent;
+}
+
+// Button states
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+}
+
+.btn-primary:disabled {
+  @apply bg-gray-300 cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply bg-white hover:bg-gray-50 text-gray-600 font-medium py-2 px-4 rounded-lg border border-gray-300 transition-colors duration-200;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .lux-container {
+    @apply py-4;
+  }
+  
+  .lux-card {
+    @apply p-4;
+  }
+  
+  .claims-table {
+    @apply text-xs;
+  }
+  
+  .claims-table th,
+  .claims-table td {
+    @apply py-2 px-2;
+  }
+}
+
+// Custom scrollbar for table
+.overflow-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.overflow-auto::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded-full;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}

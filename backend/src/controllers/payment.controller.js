@@ -7,7 +7,7 @@ export const makePayment = async (req, res) => {
     const { userPolicyId, method, reference } = req.body;
 
     const policy = await UserPolicy.findById(userPolicyId);
-    if (!policy || policy.userId.toString() !== req.user.id) {
+    if (!policy || policy.userId.toString() !== req.user.id.toString()) {
       return res.status(403).json({ message: "Unauthorized or policy not found" });
     }
 
@@ -22,6 +22,7 @@ export const makePayment = async (req, res) => {
     await payment.save();
     res.status(201).json(payment);
   } catch (err) {
+    console.error('Payment creation error:', err);
     res.status(500).json({ message: "Error making payment", error: err.message });
   }
 };
@@ -29,7 +30,14 @@ export const makePayment = async (req, res) => {
 // ✅ Customer: View payment history
 export const getMyPayments = async (req, res) => {
   try {
-    const payments = await Payment.find({ userId: req.user.id });
+    const payments = await Payment.find({ userId: req.user.id })
+      .populate({
+        path: 'userPolicyId',
+        populate: {
+          path: 'policyProductId',
+          select: 'title code'
+        }
+      });
     res.json(payments);
   } catch (err) {
     res.status(500).json({ message: "Error fetching payments", error: err.message });

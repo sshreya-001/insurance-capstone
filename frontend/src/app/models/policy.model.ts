@@ -18,7 +18,7 @@ export interface UserPolicy {
   endDate: Date;
   premiumPaid: number;
   status: 'ACTIVE' | 'CANCELLED' | 'EXPIRED';
-  assignedAgentId?: User;
+  assignedAgentId?: { _id: string; name: string; email: string };
   nominee: {
     name: string;
     relation: string;
@@ -33,4 +33,5 @@ export interface PurchasePolicyRequest {
     name: string;
     relation: string;
   };
+  assignedAgentId?: string | null;
 }

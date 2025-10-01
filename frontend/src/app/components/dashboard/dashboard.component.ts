@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { TitleCasePipe } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { PolicyService } from '../../services/policy.service';
 import { ClaimService } from '../../services/claim.service';
@@ -11,7 +12,9 @@ import { AdminSummary } from '../../models/admin.model';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
+  standalone: true,
+  imports: [TitleCasePipe]
 })
 export class DashboardComponent implements OnInit {
   currentUser: User | null = null;
@@ -28,7 +31,7 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.currentUser = this.authService.getCurrentUser();
+    this.currentUser = this.authService.currentUser;
     this.loadDashboardData();
   }
 

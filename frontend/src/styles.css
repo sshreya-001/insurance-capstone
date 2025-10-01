@@ -2,37 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global luxury gradient background */
+/* Global styles */
 @layer base {
-  html, body { height: 100%; }
+  html, body { 
+    height: 100%; 
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
   body {
-    @apply m-0 text-plum-900 font-sans antialiased;
-    background:
-      linear-gradient(180deg, rgba(243,216,210,.65), rgba(205,180,200,.55)),
-      radial-gradient(1200px 600px at 10% -10%, rgba(216,148,135,.35), transparent 60%),
-      radial-gradient(800px 400px at 110% 0%, rgba(43,36,49,.45), transparent 50%),
-      #fff;
-    background-attachment: fixed;
+    @apply text-gray-900 bg-gray-50;
+  }
+  
+  .bg-dot-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
 }
 
 /* Reusable luxury card */
 @layer components {
   .lux-container { @apply min-h-[100dvh] grid place-items-center p-6; }
-  .lux-card { @apply w-[min(720px,92vw)] bg-white/70 backdrop-blur border border-plum-900/10 rounded-xl shadow-luxury p-8; }
-  .lux-title { @apply text-3xl font-bold tracking-tight text-plum-900 mb-6; }
-  .lux-muted { @apply text-mauve-700; }
+  .lux-card { @apply w-[min(720px,92vw)] bg-white/70 backdrop-blur border border-gray-200 rounded-xl shadow-lg p-8; }
+  .lux-title { @apply text-3xl font-bold tracking-tight text-gray-900 mb-6; }
+  .lux-muted { @apply text-gray-600; }
 
   .lux-form { @apply grid gap-4 md:grid-cols-2; }
-  .lux-label { @apply flex flex-col gap-2 text-[0.95rem] text-mauve-700; }
-  .lux-input { @apply px-3 py-2.5 border border-plum-900/15 rounded-lg bg-white text-plum-900 outline-none focus:ring-4 focus:ring-peach-400/25 focus:border-peach-400; }
+  .lux-label { @apply flex flex-col gap-2 text-[0.95rem] text-gray-700; }
+  .lux-input { @apply px-3 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 outline-none focus:ring-4 focus:ring-blue-400/25 focus:border-blue-400; }
   .lux-select { @apply lux-input; }
-  .lux-button { @apply col-span-full mt-1 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-peach-400 to-mauve-700 text-white px-4 py-3 shadow-md hover:brightness-105 active:translate-y-px transition; }
-  .lux-link { @apply text-mauve-700 hover:underline; }
+  .lux-button { @apply col-span-full mt-1 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-3 shadow-md hover:brightness-105 active:translate-y-px transition; }
+  .lux-link { @apply text-gray-700 hover:underline; }
 
   /* Variants */
-  .lux-button-outline { @apply inline-flex items-center justify-center rounded-xl border border-plum-900/15 text-plum-900 px-4 py-3 bg-white/70 hover:bg-white transition; }
-  .lux-hint { @apply text-xs text-mauve-700/90; }
+  .lux-button-outline { @apply inline-flex items-center justify-center rounded-xl border border-gray-300 text-gray-900 px-4 py-3 bg-white/70 hover:bg-white transition; }
+  .lux-hint { @apply text-xs text-gray-600; }
   .lux-error { @apply text-sm text-red-600; }
 }
 

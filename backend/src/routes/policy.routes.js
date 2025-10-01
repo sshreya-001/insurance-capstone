@@ -30,6 +30,7 @@ import {
   updatePolicyProduct,
   deletePolicyProduct,
   purchasePolicy,
+  getAvailableAgents,
 } from "../controllers/policyProduct.controller.js";
 
 import authMiddleware from "../middlewares/auth.middleware.js";
@@ -46,5 +47,8 @@ router.delete("/:id", authMiddleware.requiredAuth, deletePolicyProduct);
 
 // Customer: purchase a policy
 router.post("/:policyId/purchase", authMiddleware.requiredAuth, purchasePolicy);
+
+// Public: get available agents for policy assignment
+router.get("/agents", getAvailableAgents);
 
 export default router;

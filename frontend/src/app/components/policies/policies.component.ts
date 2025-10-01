@@ -1,12 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { PolicyService } from '../../services/policy.service';
 import { AuthService } from '../../services/auth.service';
 import { PolicyProduct, PurchasePolicyRequest } from '../../models/policy.model';
 import { User } from '../../models/user.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-policies',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './policies.component.html',
   styleUrls: ['./policies.component.scss']
 })
@@ -18,6 +23,8 @@ export class PoliciesComponent implements OnInit {
   selectedPolicy: PolicyProduct | null = null;
   showPurchaseModal = false;
   purchasing = false;
+
+  private http = inject(HttpClient);
 
   constructor(
     private policyService: PolicyService,
@@ -32,7 +39,7 @@ export class PoliciesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.currentUser = this.authService.getCurrentUser();
+    this.currentUser = this.authService.currentUser as any;
     this.loadPolicies();
   }
 
@@ -49,6 +56,7 @@ export class PoliciesComponent implements OnInit {
       }
     });
   }
+
 
   openPurchaseModal(policy: PolicyProduct): void {
     if (this.currentUser?.role !== 'customer') {
@@ -82,10 +90,10 @@ export class PoliciesComponent implements OnInit {
       };
 
       this.policyService.purchasePolicy(this.selectedPolicy._id, request).subscribe({
-        next: (response) => {
+        next: (response: any) => {
           this.purchasing = false;
           this.closePurchaseModal();
-          alert('Policy purchased successfully!');
+          alert('Policy purchased successfully! An admin will assign an agent to your policy shortly.');
         },
         error: (error) => {
           this.purchasing = false;
@@ -93,5 +101,12 @@ export class PoliciesComponent implements OnInit {
         }
       });
     }
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR'
+    }).format(amount);
   }
 }

@@ -31,7 +31,12 @@ export class RegisterComponent {
       this.loading = true;
       this.error = '';
       
-      this.authService.register(this.registerForm.value).subscribe({
+      this.authService.signup(
+        this.registerForm.value.name,
+        this.registerForm.value.email,
+        this.registerForm.value.password,
+        this.registerForm.value.role
+      ).subscribe({
         next: (response) => {
           this.loading = false;
           this.router.navigate(['/dashboard']);

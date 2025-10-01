@@ -70,6 +70,7 @@
 import PolicyProduct from "../models/PolicyProduct.js";
 import Policy from "../models/Policy.js";
 import UserPolicy from "../models/UserPolicy.js";
+import User from "../models/User.js";
 
 /**
  * Create a new Policy Product (Admin only)
@@ -80,13 +81,15 @@ export const createPolicyProduct = async (req, res) => {
       return res.status(403).json({ message: "Only admin can create policies" });
     }
 
-    const { name, description, premium, coverageAmount } = req.body;
+    const { code, title, description, premium, termMonths, minSumInsured } = req.body;
 
     const product = await PolicyProduct.create({
-      name,
+      code,
+      title,
       description,
       premium,
-      coverageAmount,
+      termMonths,
+      minSumInsured,
     });
 
     res.status(201).json({
@@ -95,7 +98,7 @@ export const createPolicyProduct = async (req, res) => {
     });
   } catch (error) {
     console.error("Create Policy Product Error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -122,11 +125,11 @@ export const updatePolicyProduct = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { name, description, premium, coverageAmount } = req.body;
+    const { code, title, description, premium, termMonths, minSumInsured } = req.body;
 
     const updatedProduct = await PolicyProduct.findByIdAndUpdate(
       id,
-      { name, description, premium, coverageAmount },
+      { code, title, description, premium, termMonths, minSumInsured },
       { new: true }
     );
 
@@ -140,7 +143,7 @@ export const updatePolicyProduct = async (req, res) => {
     });
   } catch (error) {
     console.error("Update Policy Product Error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -163,7 +166,7 @@ export const deletePolicyProduct = async (req, res) => {
     res.json({ message: "Policy product deleted successfully" });
   } catch (error) {
     console.error("Delete Policy Product Error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -173,17 +176,19 @@ export const deletePolicyProduct = async (req, res) => {
 export const purchasePolicy = async (req, res) => {
   try {
     const { policyId } = req.params;
-    const {  termMonths, nominee } = req.body;
+    const { termMonths, nominee } = req.body;
 
     // Check if product exists
     const product = await PolicyProduct.findById(policyId);
     if (!product) {
       return res.status(404).json({ message: "Policy product not found" });
     }
+
     const startDate = Date.now();
-    const endDate = new Date(startDate)
-    endDate.setMonth(endDate.getMonth()+(termMonths || product.termMonths))
-    // Create a Policy document for this customer
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + (termMonths || product.termMonths));
+    
+    // Create a Policy document for this customer (no agent assigned yet)
     const userPolicy = await UserPolicy.create({
       userId: req.user.id,
       policyProductId: policyId,
@@ -191,16 +196,105 @@ export const purchasePolicy = async (req, res) => {
       endDate,
       premiumPaid: product.premium,
       nominee,
-      status: "ACTIVE",
+      status: "PENDING_AGENT", // New status for policies waiting for agent assignment
+      assignedAgentId: null, // No agent assigned initially
       createdAt: new Date(),
     });
 
+    // Populate the response with product details
+    const populatedPolicy = await UserPolicy.findById(userPolicy._id)
+      .populate('policyProductId', 'title code');
+
     res.status(201).json({
-      message: "Policy purchased successfully",
-      policy: userPolicy,
+      message: "Policy purchased successfully. An admin will assign an agent to your policy shortly.",
+      policy: populatedPolicy,
     });
   } catch (error) {
-    // console.error("Purchase Policy Error:", error);
-    res.status(500).json({ message: "Server error"+error });
+    console.error("Purchase Policy Error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+/**
+ * Automatically assign an agent to a policy
+ * Uses round-robin or least-loaded agent strategy
+ */
+const assignAgentAutomatically = async () => {
+  try {
+    // Get all active agents
+    const agents = await User.find({ 
+      role: "agent", 
+      isActive: true 
+    }).select('_id name email');
+
+    if (agents.length === 0) {
+      console.log("No active agents found for auto-assignment");
+      return null; // No agent assigned
+    }
+
+    // Get policy counts for each agent
+    const agentPolicyCounts = await UserPolicy.aggregate([
+      { $match: { assignedAgentId: { $exists: true, $ne: null } } },
+      { $group: { _id: "$assignedAgentId", count: { $sum: 1 } } }
+    ]);
+
+    // Create a map of agent policy counts
+    const policyCountMap = {};
+    agentPolicyCounts.forEach(item => {
+      policyCountMap[item._id.toString()] = item.count;
+    });
+
+    // Find the agent with the least policies
+    let selectedAgent = agents[0];
+    let minPolicies = policyCountMap[selectedAgent._id.toString()] || 0;
+
+    for (const agent of agents) {
+      const policyCount = policyCountMap[agent._id.toString()] || 0;
+      if (policyCount < minPolicies) {
+        selectedAgent = agent;
+        minPolicies = policyCount;
+      }
+    }
+
+    console.log(`Auto-assigned agent: ${selectedAgent.name} (${selectedAgent.email})`);
+    return selectedAgent._id;
+  } catch (error) {
+    console.error("Error in auto-assignment:", error);
+    return null;
+  }
+};
+
+/**
+ * Get available agents for policy assignment
+ */
+export const getAvailableAgents = async (req, res) => {
+  try {
+    // Get all agents (temporarily removing isActive filter to get it working)
+    const agents = await User.find({ 
+      role: "agent"
+    }).select('_id name email');
+
+    // Get policy counts for each agent
+    const agentPolicyCounts = await UserPolicy.aggregate([
+      { $match: { assignedAgentId: { $exists: true, $ne: null } } },
+      { $group: { _id: "$assignedAgentId", count: { $sum: 1 } } }
+    ]);
+
+    // Add policy count to each agent
+    const agentsWithCounts = agents.map(agent => {
+      const policyCount = agentPolicyCounts.find(
+        count => count._id.toString() === agent._id.toString()
+      )?.count || 0;
+      
+      return {
+        ...agent.toObject(),
+        policiesCount: policyCount
+      };
+    });
+
+    res.json(agentsWithCounts);
+  } catch (error) {
+    console.error("Error getting available agents:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
